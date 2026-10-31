@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>غابة التركيز - مؤقت المذاكرة والإنتاجية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        .farm-tile-3d {
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 0 #064e3b, 0 15px 20px rgba(0,0,0,0.4);
+        }
+        .farm-tile-3d:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 0 #064e3b, 0 20px 25px rgba(0,0,0,0.5);
+        }
+        .farm-tile-dead-3d {
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 0 #7f1d1d, 0 15px 20px rgba(0,0,0,0.4);
+        }
+        .farm-tile-dead-3d:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 0 #7f1d1d, 0 20px 25px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="bg-emerald-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+    <!-- الشريط العلوي -->
+    <header class="w-full max-w-4xl mx-auto px-6 py-4 flex justify-between items-center border-b border-emerald-900/60">
+        <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-3xl">🌲</span>
+            <h1 class="text-xl font-bold tracking-wide text-emerald-400">غابة التركيز</h1>
+        </div>
+        <div class="flex items-center space-x-3 space-x-reverse bg-emerald-900/40 px-4 py-2 rounded-full border border-emerald-800/60 text-xs sm:text-sm">
+            <div class="flex items-center space-x-1 space-x-reverse" title="النقاط الذهبية">
+                <span>🪙</span>
+                <span id="header-coins" class="font-bold text-amber-400">0</span>
+            </div>
+            <div class="h-4 w-px bg-emerald-800"></div>
+            <div class="flex items-center space-x-1 space-x-reverse" title="الأشجار المكتملة">
+                <span>🌳</span>
+                <span id="header-trees" class="font-bold text-emerald-400">0</span>
+            </div>
+            <div class="h-4 w-px bg-emerald-800"></div>
+            <div class="flex items-center space-x-1 space-x-reverse" title="الأشجار الميتة/الفاسدة">
+                <span>🥀</span>
+                <span id="header-dead-trees" class="font-bold text-rose-400">0</span>
+            </div>
+            <div class="h-4 w-px bg-emerald-800"></div>
+            <div class="flex items-center space-x-1 space-x-reverse" title="أيام التتابع">
+                <span>🔥</span>
+                <span id="header-streak" class="font-bold text-orange-400">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="w-full max-w-4xl mx-auto px-4 py-6 flex-1 flex flex-col items-center justify-center">
+        
+        <!-- التبويب الأول: مؤقت التركيز -->
+        <div id="tab-focus-view" class="w-full flex flex-col items-center">
+            
+            <!-- شاشة إعداد الجلسة -->
+            <div id="setup-view" class="w-full bg-emerald-900/20 border border-emerald-800/50 rounded-3xl p-6 backdrop-blur-md shadow-xl flex flex-col items-center">
+                
+                <h2 class="text-lg font-bold text-emerald-300 mb-3">اختر مادة الدراسة أو أضف مهمة جديدة</h2>
+                
+                <!-- شبكة المواد -->
+                <div id="subjects-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full mb-4">
+                    <!-- تتولد الأزرار بالعربية -->
+                </div>
+
+                <!-- إضافة مادة مخصصة -->
+                <div class="w-full flex items-center space-x-2 space-x-reverse mb-6 bg-emerald-950/40 p-2 rounded-2xl border border-emerald-800/40">
+                    <input type="text" id="custom-subject-input" placeholder="+ اكتب اسم المادة أو المهمة..." class="flex-1 bg-transparent px-3 py-1.5 text-sm text-emerald-100 placeholder-emerald-600 focus:outline-none">
+                    <button onclick="addCustomSubject()" class="bg-emerald-600 hover:bg-emerald-500 text-emerald-950 font-bold text-xs px-4 py-2 rounded-xl transition">
+                        إضافة مادة
+                    </button>
+                </div>
+
+                <!-- اختيار نوع الشجرة -->
+                <h2 class="text-lg font-bold text-emerald-300 mb-3">اختر نوع الشجرة للزراعة في المزرعة</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full mb-6" id="tree-types-grid">
+                    <button onclick="selectTreeType('pine', this)" class="tree-type-btn p-3 rounded-2xl border text-sm font-medium transition bg-emerald-500/30 border-emerald-400 text-emerald-200 ring-2 ring-emerald-400 flex flex-col items-center space-y-1">
+                        <span class="text-xl">🌲</span>
+                        <span>صنوبر كلاسيكي</span>
+                    </button>
+                    <button onclick="selectTreeType('oak', this)" class="tree-type-btn p-3 rounded-2xl border text-sm font-medium transition bg-emerald-900/30 border-emerald-800 text-emerald-300 opacity-70 hover:opacity-100 flex flex-col items-center space-y-1">
+                        <span class="text-xl">🌳</span>
+                        <span>شجرة البلوط</span>
+                    </button>
+                    <button onclick="selectTreeType('palm', this)" class="tree-type-btn p-3 rounded-2xl border text-sm font-medium transition bg-emerald-900/30 border-emerald-800 text-emerald-300 opacity-70 hover:opacity-100 flex flex-col items-center space-y-1">
+                        <span class="text-xl">🌴</span>
+                        <span>نخلة باسقة</span>
+                    </button>
+                    <button onclick="selectTreeType('cherry', this)" class="tree-type-btn p-3 rounded-2xl border text-sm font-medium transition bg-emerald-900/30 border-emerald-800 text-emerald-300 opacity-70 hover:opacity-100 flex flex-col items-center space-y-1">
+                        <span class="text-xl">🌸</span>
+                        <span>شجرة وردية</span>
+                    </button>
+                </div>
+
+                <h2 class="text-lg font-bold text-emerald-300 mb-3">مدة التركيز (بالدقائق)</h2>
+                <div class="flex items-center justify-center space-x-4 space-x-reverse mb-6">
+                    <button onclick="adjustTime(-5)" class="bg-emerald-800/60 hover:bg-emerald-700 text-white font-bold w-10 h-10 rounded-full transition">-5</button>
+                    <div class="text-4xl font-extrabold text-emerald-200 w-24 text-center" id="time-display">25</div>
+                    <button onclick="adjustTime(5)" class="bg-emerald-800/60 hover:bg-emerald-700 text-white font-bold w-10 h-10 rounded-full transition">+5</button>
+                </div>
+
+                <!-- أصوات الخلفية -->
+                <div class="flex items-center space-x-3 space-x-reverse mb-6 bg-emerald-950/40 px-4 py-2 rounded-xl border border-emerald-800/30">
+                    <span class="text-sm text-emerald-300">أصوات التركيز:</span>
+                    <select id="sound-select" class="bg-emerald-900 text-emerald-200 text-sm px-3 py-1.5 rounded-lg border border-emerald-700 outline-none">
+                        <option value="none">بدون صوت</option>
+                        <option value="rain">صوت المطر</option>
+                        <option value="forest">أصوات الطبيعة</option>
+                        <option value="lofi">نغمات هادئة</option>
+                    </select>
+                    <button id="sound-toggle-btn" onclick="toggleSound()" class="bg-emerald-700 hover:bg-emerald-600 text-xs px-3 py-1.5 rounded-lg font-medium transition">تشغيل</button>
+                </div>
+
+                <button onclick="startFocusSession()" class="w-full sm:w-64 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-emerald-950 font-bold py-3.5 px-8 rounded-2xl shadow-lg transition transform hover:scale-[1.02] text-lg">
+                    ابدأ زراعة الشجرة 🌱
+                </button>
+            </div>
+
+            <!-- شاشة زراعة الشجرة والمؤقت النشط -->
+            <div id="active-view" class="hidden w-full bg-emerald-900/20 border border-emerald-800/50 rounded-3xl p-8 backdrop-blur-md shadow-xl flex flex-col items-center text-center">
+                <div class="text-sm uppercase font-bold text-emerald-400 mb-2" id="active-subject-badge">المادة الحالية</div>
+                
+                <div class="my-6 relative w-48 h-48 flex items-center justify-center">
+                    <svg id="tree-svg" class="w-44 h-44 drop-shadow-lg" viewBox="0 0 100 100">
+                        <path d="M 30 85 L 70 85 L 65 95 L 35 95 Z" fill="#4B382A"/>
+                        <g id="tree-graphics">
+                            <circle cx="50" cy="83" r="3" fill="#D97706" id="stage-seed"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="text-5xl font-mono font-bold tracking-wider text-white mb-2" id="countdown-timer">25:00</div>
+                <p class="text-sm text-emerald-300/80 mb-8 max-w-xs">حافظ على تركيزك! إغلاق التطبيق سيؤدي لموت شجرتك في المزرعة.</p>
+
+                <button onclick="surrenderSession()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-6 py-2.5 rounded-xl font-medium text-sm transition">
+                    استسلام (إماتة الشجرة) 🥀
+                </button>
+            </div>
+        </div>
+
+        <!-- التبويب الثاني: مركز الدراسة وقارئ الكتب -->
+        <div id="tab-hub-view" class="hidden w-full bg-emerald-900/20 border border-emerald-800/50 rounded-3xl p-6 backdrop-blur-md shadow-xl flex flex-col items-center">
+            <h2 class="text-xl font-bold text-emerald-300 mb-2">📚 مركز الدراسة والمنصات التعليمية</h2>
+            <p class="text-xs text-emerald-400/80 mb-6 text-center">اقرأ ملازمك بصيغة PDF أو افتح منصاتك التعليمية المفضلة بنقرة واحدة.</p>
+
+            <div class="flex space-x-2 space-x-reverse mb-6 bg-emerald-950/60 p-1.5 rounded-2xl border border-emerald-800/40">
+                <button id="mode-btn-pdf" onclick="switchHubMode('pdf')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-emerald-950 shadow transition">
+                    📄 قارئ الملازم والكتب (PDF)
+                </button>
+                <button id="mode-btn-web" onclick="switchHubMode('web')" class="px-4 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white transition">
+                    🌐 المنصات والمواقع التعليمية
+                </button>
+            </div>
+
+            <!-- قارئ الـ PDF -->
+            <div id="hub-pdf-section" class="w-full flex flex-col items-center">
+                <div class="w-full mb-4 flex flex-wrap items-center justify-between gap-3 bg-emerald-950/40 p-3 rounded-2xl border border-emerald-800/30">
+                    <label class="cursor-pointer bg-emerald-700 hover:bg-emerald-600 text-white font-medium text-xs px-4 py-2 rounded-xl transition flex items-center space-x-2 space-x-reverse">
+                        <span>📁 اختر ملف ملزمة أو كتاب (PDF)</span>
+                        <input type="file" id="pdf-file-input" accept="application/pdf" onchange="loadPDF(event)" class="hidden">
+                    </label>
+                    <span id="pdf-name" class="text-xs text-emerald-300 truncate max-w-xs">لم يتم اختيار أي ملف بعد</span>
+                </div>
+                
+                <div class="w-full h-[500px] bg-emerald-950/80 rounded-2xl border border-emerald-800/50 flex items-center justify-center overflow-hidden">
+                    <iframe id="pdf-frame" class="w-full h-full hidden" src=""></iframe>
+                    <div id="pdf-placeholder" class="text-center p-6 text-emerald-600">
+                        <span class="text-5xl block mb-3">📖</span>
+                        <p class="text-sm font-medium">قم برفع ملف PDF لمذاكرته وقراءته هنا أثناء زراعة شجرتك.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم المنصات والمواقع -->
+            <div id="hub-web-section" class="hidden w-full flex flex-col items-center py-8">
+                <div class="text-center max-w-md mb-8">
+                    <span class="text-6xl block mb-4">🚀</span>
+                    <h3 class="text-lg font-bold text-emerald-200 mb-6">المنصات التعليمية الرسمية</h3>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <a href="https://ktby.net" target="_blank" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-emerald-950 font-bold px-6 py-3 rounded-2xl shadow-lg transition flex items-center justify-center space-x-2 space-x-reverse text-sm">
+                            <span>📚</span>
+                            <span>فتح موقع كتبي ↗</span>
+                        </a>
+                        <a href="https://me.classera.com" target="_blank" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition flex items-center justify-center space-x-2 space-x-reverse text-sm">
+                            <span>🎓</span>
+                            <span>فتح منصة كلاسيرا ↗</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="w-full border-t border-emerald-800/40 pt-6 mt-4">
+                    <p class="text-xs text-emerald-400 text-center mb-3">أو تصفح مكتبات الكتب المفتوحة العالمية:</p>
+                    <div class="flex justify-center gap-3">
+                        <a href="https://openlibrary.org" target="_blank" class="bg-emerald-900/50 hover:bg-emerald-800/70 px-4 py-2 rounded-xl text-xs text-emerald-200 border border-emerald-700/50">المفتوحة OpenLibrary ↗</a>
+                        <a href="https://archive.org" target="_blank" class="bg-emerald-900/50 hover:bg-emerald-800/70 px-4 py-2 rounded-xl text-xs text-emerald-200 border border-emerald-700/50">أرشيف الإنترنت Archive ↗</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- التبويب الثالث: المزرعة ثلاثية الأبعاد 3D -->
+        <div id="tab-forest-view" class="hidden w-full bg-emerald-900/20 border border-emerald-800/50 rounded-3xl p-6 backdrop-blur-md shadow-xl flex flex-col items-center">
+            <div class="w-full flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-emerald-300">🌾 المزرعة الواقعية ثلاثية الأبعاد (3D)</h2>
+                <button onclick="resetAllData()" class="bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 px-3 py-1 rounded-xl text-xs transition">
+                    🔄 إعادة ضبط العدادات
+                </button>
+            </div>
+            <p class="text-xs text-emerald-400/80 mb-6 text-center w-full">انقر على أي شجرة في قطع أرض المزرعة أدناه لاستعراض تفاصيل جلسة مذاكرتها بدقة!</p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full mb-6">
+                <div class="bg-emerald-950/60 p-3 rounded-2xl text-center border border-emerald-800/30">
+                    <span class="text-xs text-emerald-400 block mb-1">🌳 الأشجار الحية</span>
+                    <span id="stats-total-trees" class="text-xl font-bold text-emerald-300">0</span>
+                </div>
+                <div class="bg-emerald-950/60 p-3 rounded-2xl text-center border border-emerald-800/30">
+                    <span class="text-xs text-rose-400 block mb-1">🥀 الأشجار الفاسدة</span>
+                    <span id="stats-dead-trees" class="text-xl font-bold text-rose-400">0</span>
+                </div>
+                <div class="bg-emerald-950/60 p-3 rounded-2xl text-center border border-emerald-800/30">
+                    <span class="text-xs text-amber-400 block mb-1">🪙 النقاط الكلية</span>
+                    <span id="stats-total-coins" class="text-xl font-bold text-amber-400">0</span>
+                </div>
+                <div class="bg-emerald-950/60 p-3 rounded-2xl text-center border border-emerald-800/30">
+                    <span class="text-xs text-orange-400 block mb-1">🔥 سلسلة الأيام</span>
+                    <span id="stats-streak-days" class="text-xl font-bold text-orange-400">0</span>
+                </div>
+            </div>
+
+            <!-- لوحة أرض المزرعة 3D -->
+            <div class="w-full mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-sm font-bold text-emerald-300">🌱 أراضي المزرعة (3D Farm Plots):</h3>
+                    <span class="text-[11px] text-emerald-500">اضغط على القطعة لعرض التفاصيل</span>
+                </div>
+                <div id="visual-forest-grid" class="w-full min-h-[220px] max-h-72 overflow-y-auto bg-gradient-to-b from-emerald-950 via-emerald-900/40 to-amber-950/60 p-5 rounded-3xl border-2 border-emerald-800/80 grid grid-cols-3 sm:grid-cols-5 gap-4 items-center" style="perspective: 1200px;">
+                    <!-- تتولد قطع أرض المزرعة 3D هنا -->
+                </div>
+            </div>
+
+            <!-- سجل الجلسات المفصل -->
+            <div class="w-full text-right">
+                <h3 class="text-sm font-bold text-emerald-300 mb-3">📖 السجل التفصيلي للجلسات:</h3>
+                <div id="history-list" class="w-full space-y-2.5 max-h-48 overflow-y-auto pr-1">
+                    <!-- سجل الجلسات -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- شريط التنقل السفلي -->
+    <nav class="w-full max-w-md mx-auto px-6 py-4 flex justify-around border-t border-emerald-900/60 bg-emerald-950/80 backdrop-blur-md">
+        <button onclick="switchTab('focus')" id="nav-focus" class="flex flex-col items-center text-emerald-400 text-xs font-bold space-y-1">
+            <span class="text-xl">⏳</span>
+            <span>المؤقت</span>
+        </button>
+        <button onclick="switchTab('hub')" id="nav-hub" class="flex flex-col items-center text-emerald-600/70 hover:text-emerald-400 text-xs font-bold space-y-1 transition">
+            <span class="text-xl">📚</span>
+            <span>مركز الدراسة</span>
+        </button>
+        <button onclick="switchTab('forest')" id="nav-forest" class="flex flex-col items-center text-emerald-600/70 hover:text-emerald-400 text-xs font-bold space-y-1 transition">
+            <span class="text-xl">🌾</span>
+            <span>المزرعة</span>
+        </button>
+    </nav>
+
+    <!-- التذييل (Footer) -->
+    <footer class="w-full py-4 text-center border-t border-emerald-900/40 bg-emerald-950/90 text-emerald-500 text-xs space-y-1">
+        <p>© 2026 غابة التركيز. جميع الحقوق محفوظة.</p>
+        <p class="text-emerald-300 font-semibold">بواسطة الطالب: <span class="text-amber-400 font-bold">بدر القحطاني</span> 🌟</p>
+        <p class="text-emerald-400/80">بدعم من <span class="text-emerald-300 font-medium">مدارس واحة جدة الأهلية</span> 🏫</p>
+    </footer>
+
+    <!-- البرمجة والمنطق -->
+    <script>
+        let defaultSubjects = [
+            { id: 'math', name: 'الرياضيات', custom: false },
+            { id: 'physics', name: 'الفيزياء', custom: false },
+            { id: 'chem', name: 'الكيمياء', custom: false },
+            { id: 'tech', name: 'التقنية الرقمية', custom: false }
+        ];
+
+        let state = {
+            coins: 0,
+            treesCount: 0,
+            deadTreesCount: 0,
+            streak: 0,
+            history: [],
+            subjects: defaultSubjects,
+            selectedSubject: 'الرياضيات',
+            selectedTreeType: 'pine',
+            durationMinutes: 25,
+            remainingSeconds: 25 * 60,
+            timerInterval: null,
+            isSessionActive: false
+        };
+
+        function loadStorage() {
+            try {
+                const savedCoins = localStorage.getItem('forest_coins');
+                if (savedCoins !== null) state.coins = parseInt(savedCoins);
+
+                const savedTrees = localStorage.getItem('forest_trees_count');
+                if (savedTrees !== null) state.treesCount = parseInt(savedTrees);
+
+                const savedDeadTrees = localStorage.getItem('forest_dead_trees_count');
+                if (savedDeadTrees !== null) state.deadTreesCount = parseInt(savedDeadTrees);
+
+                const savedStreak = localStorage.getItem('forest_streak');
+                if (savedStreak !== null) state.streak = parseInt(savedStreak);
+
+                const savedHistory = localStorage.getItem('forest_history');
+                if (savedHistory) state.history = JSON.parse(savedHistory);
+
+                const savedSubjects = localStorage.getItem('forest_custom_subjects');
+                if (savedSubjects) state.subjects = JSON.parse(savedSubjects);
+            } catch (e) {
+                console.error("خطأ في التخزين المحلي", e);
+            }
+        }
+
+        function saveStorage() {
+            localStorage.setItem('forest_coins', state.coins);
+            localStorage.setItem('forest_trees_count', state.treesCount);
+            localStorage.setItem('forest_dead_trees_count', state.deadTreesCount);
+            localStorage.setItem('forest_streak', state.streak);
+            localStorage.setItem('forest_history', JSON.stringify(state.history));
+            localStorage.setItem('forest_custom_subjects', JSON.stringify(state.subjects));
+        }
+
+        function init() {
+            loadStorage();
+            renderSubjects();
+            updateHeader();
+            renderVisualForest();
+            renderHistory();
+        }
+
+        function resetAllData() {
+            if (confirm("هل أنت متأكد من تصفير المزرعة وجميع العدادات والسجل؟")) {
+                localStorage.clear();
+                state.coins = 0;
+                state.treesCount = 0;
+                state.deadTreesCount = 0;
+                state.streak = 0;
+                state.history = [];
+                state.subjects = defaultSubjects;
+                saveStorage();
+                init();
+                alert("تم تصفير مزرعتك وجميع العدادات بنجاح!");
+            }
+        }
+
+        function renderSubjects() {
+            const grid = document.getElementById('subjects-grid');
+            if (!grid) return;
+            grid.innerHTML = state.subjects.map(sub => `
+                <div class="relative group">
+                    <button onclick="selectSubject('${sub.name}')" class="w-full p-3 rounded-2xl border text-sm font-medium transition ${state.selectedSubject === sub.name ? 'bg-emerald-500/30 border-emerald-400 text-emerald-200 ring-2 ring-emerald-400' : 'bg-emerald-900/30 border-emerald-800 text-emerald-300 opacity-70 hover:opacity-100'}">
+                        ${sub.name}
+                    </button>
+                    ${sub.custom ? `<button onclick="deleteCustomSubject('${sub.id}')" class="absolute -top-1 -left-1 bg-rose-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center opacity-80 hover:opacity-100" title="حذف">✕</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function selectTreeType(type, btnElement) {
+            state.selectedTreeType = type;
+            document.querySelectorAll('.tree-type-btn').forEach(btn => {
+                btn.className = "tree-type-btn p-3 rounded-2xl border text-sm font-medium transition bg-emerald-900/30 border-emerald-800 text-emerald-300 opacity-70 hover:opacity-100 flex flex-col items-center space-y-1";
+            });
+            btnElement.className = "tree-type-btn p-3 rounded-2xl border text-sm font-medium transition bg-emerald-500/30 border-emerald-400 text-emerald-200 ring-2 ring-emerald-400 flex flex-col items-center space-y-1";
+        }
+
+        function addCustomSubject() {
+            const input = document.getElementById('custom-subject-input');
+            const name = input ? input.value.trim() : '';
+            if (!name) return;
+
+            const newSubject = {
+                id: 'custom_' + Date.now(),
+                name: name,
+                custom: true
+            };
+
+            state.subjects.push(newSubject);
+            state.selectedSubject = name;
+            saveStorage();
+            if (input) input.value = '';
+            renderSubjects();
+        }
+
+        function deleteCustomSubject(id) {
+            state.subjects = state.subjects.filter(s => s.id !== id);
+            saveStorage();
+            if (state.subjects.length > 0) {
+                state.selectedSubject = state.subjects[0].name;
+            }
+            renderSubjects();
+        }
+
+        function selectSubject(name) {
+            state.selectedSubject = name;
+            renderSubjects();
+        }
+
+        function adjustTime(amount) {
+            if (state.isSessionActive) return;
+            state.durationMinutes = Math.max(5, Math.min(120, state.durationMinutes + amount));
+            state.remainingSeconds = state.durationMinutes * 60;
+            const timeDisplay = document.getElementById('time-display');
+            if (timeDisplay) timeDisplay.innerText = state.durationMinutes;
+        }
+
+        function updateHeader() {
+            document.getElementById('header-coins').innerText = state.coins;
+            document.getElementById('header-trees').innerText = state.treesCount;
+            document.getElementById('header-dead-trees').innerText = state.deadTreesCount;
+            document.getElementById('header-streak').innerText = state.streak;
+            
+            document.getElementById('stats-total-trees').innerText = state.treesCount;
+            document.getElementById('stats-dead-trees').innerText = state.deadTreesCount;
+            document.getElementById('stats-total-coins').innerText = state.coins;
+            document.getElementById('stats-streak-days').innerText = state.streak;
+
+            saveStorage();
+        }
+
+        function startFocusSession() {
+            state.isSessionActive = true;
+            state.remainingSeconds = state.durationMinutes * 60;
+            document.getElementById('setup-view').classList.add('hidden');
+            document.getElementById('active-view').classList.remove('hidden');
+            document.getElementById('active-subject-badge').innerText = 'المادة: ' + state.selectedSubject;
+            
+            updateTimerDisplay();
+            updateTreeGraphics(0);
+
+            state.timerInterval = setInterval(() => {
+                state.remainingSeconds--;
+                updateTimerDisplay();
+                
+                let progress = 1 - (state.remainingSeconds / (state.durationMinutes * 60));
+                updateTreeGraphics(progress);
+
+                if (state.remainingSeconds <= 0) {
+                    completeSession(true);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(state.remainingSeconds / 60);
+            const secs = state.remainingSeconds % 60;
+            const timer = document.getElementById('countdown-timer');
+            if (timer) timer.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateTreeGraphics(progress) {
+            const g = document.getElementById('tree-graphics');
+            if (!g) return;
+
+            if (progress < 0.25) {
+                g.innerHTML = `<circle cx="50" cy="83" r="4" fill="#D97706"/>`;
+            } else if (progress < 0.5) {
+                g.innerHTML = `<path d="M 50 85 Q 50 70 45 65 Q 50 65 55 70 Z" fill="#34D399"/><circle cx="50" cy="83" r="3" fill="#D97706"/>`;
+            } else if (progress < 0.85) {
+                g.innerHTML = `<path d="M 48 85 L 48 60 Q 48 50 50 45 Q 52 50 52 60 L 52 85 Z" fill="#78350F"/><circle cx="50" cy="40" r="14" fill="#059669"/>`;
+            } else {
+                renderActiveTreePreview(g, state.selectedTreeType);
+            }
+        }
+
+        function renderActiveTreePreview(container, type) {
+            if (type === 'pine') {
+                container.innerHTML = `
+                    <path d="M 47 85 L 47 50 Q 47 35 50 20 Q 53 35 53 50 L 53 85 Z" fill="#78350F"/>
+                    <polygon points="50,15 30,45 70,45" fill="#059669"/>
+                    <polygon points="50,28 35,60 65,60" fill="#10B981"/>
+                    <polygon points="50,42 25,78 75,78" fill="#34D399"/>
+                `;
+            } else if (type === 'oak') {
+                container.innerHTML = `
+                    <path d="M 46 85 L 46 48 Q 46 35 50 25 Q 54 35 54 48 L 54 85 Z" fill="#5C4033"/>
+                    <circle cx="50" cy="30" r="18" fill="#15803d"/>
+                    <circle cx="37" cy="42" r="14" fill="#16a34a"/>
+                    <circle cx="63" cy="42" r="14" fill="#16a34a"/>
+                `;
+            } else if (type === 'palm') {
+                container.innerHTML = `
+                    <path d="M 48 85 Q 46 55 49 25 L 51 25 Q 54 55 52 85 Z" fill="#854d0e"/>
+                    <path d="M 50 25 Q 30 15 15 30 Q 30 28 50 35 Z" fill="#15803d"/>
+                    <path d="M 50 25 Q 70 15 85 30 Q 70 28 50 35 Z" fill="#15803d"/>
+                    <path d="M 50 25 Q 35 5 20 15 Q 35 20 50 30 Z" fill="#16a34a"/>
+                    <path d="M 50 25 Q 65 5 80 15 Q 65 20 50 30 Z" fill="#16a34a"/>
+                `;
+            } else if (type === 'cherry') {
+                container.innerHTML = `
+                    <path d="M 47 85 L 47 50 Q 47 38 50 28 Q 53 38 53 50 L 53 85 Z" fill="#78350F"/>
+                    <circle cx="50" cy="30" r="17" fill="#f472b6"/>
+                    <circle cx="37" cy="40" r="13" fill="#ec4899"/>
+                    <circle cx="63" cy="40" r="13" fill="#ec4899"/>
+                    <circle cx="50" cy="20" r="11" fill="#fbcfe8"/>
+                `;
+            }
+        }
+
+        function completeSession(success) {
+            clearInterval(state.timerInterval);
+            state.isSessionActive = false;
+
+            let treeIcon = '🌲';
+            if (state.selectedTreeType === 'oak') treeIcon = '🌳';
+            if (state.selectedTreeType === 'palm') treeIcon = '🌴';
+            if (state.selectedTreeType === 'cherry') treeIcon = '🌸';
+            if (!success) treeIcon = '🥀';
+
+            if (success) {
+                state.treesCount++;
+                state.coins += state.durationMinutes >= 25 ? 10 : 5;
+                state.streak = Math.max(1, state.streak + 1);
+                state.history.unshift({
+                    subject: state.selectedSubject,
+                    duration: state.durationMinutes,
+                    date: new Date().toLocaleDateString('ar-SA'),
+                    status: 'ناجحة',
+                    treeType: state.selectedTreeType,
+                    icon: treeIcon
+                });
+                alert(`🎉 أحسنت! ركزت في مادة "${state.selectedSubject}" لمدة ${state.durationMinutes} دقيقة، وتم نمو شجرتك بنجاح في المزرعة!`);
+            } else {
+                state.deadTreesCount++;
+                state.history.unshift({
+                    subject: state.selectedSubject,
+                    duration: state.durationMinutes - Math.ceil(state.remainingSeconds / 60),
+                    date: new Date().toLocaleDateString('ar-SA'),
+                    status: 'ذبلت',
+                    treeType: 'dead',
+                    icon: '🥀'
+                });
+                alert(`🥀 مع الأسف ذبلت الشجرة وتحولت إلى شجرة ذبلانة في المزرعة... استعن بالله وحاول مرة أخرى!`);
+            }
+
+            document.getElementById('active-view').classList.add('hidden');
+            document.getElementById('setup-view').classList.remove('hidden');
+            updateHeader();
+            renderVisualForest();
+            renderHistory();
+        }
+
+        function surrenderSession() {
+            if (confirm("هل أنت متأكد من الاستسلام؟ ستفقد الشجرة الحالية وتتحول لشجرة ذبلانة في المزرعة.")) {
+                completeSession(false);
+            }
+        }
+
+        function renderVisualForest() {
+            const forestGrid = document.getElementById('visual-forest-grid');
+            if (!forestGrid) return;
+
+            if (state.history.length === 0) {
+                forestGrid.innerHTML = `
+                    <div class="col-span-full text-center py-10 text-emerald-400/70">
+                        <span class="text-5xl block mb-2">🌾</span>
+                        <p class="text-sm font-medium">أرض مزرعتك 3D فارغة حالياً... ابدأ أول جلسة تركيز لاغراس شجرتك الأولى!</p>
+                    </div>`;
+                return;
+            }
+
+            forestGrid.innerHTML = state.history.map((item, index) => {
+                const isDead = item.status === 'ذبلت';
+                const tileClass = isDead ? 'farm-tile-dead-3d bg-gradient-to-b from-rose-900 to-rose-950 border-rose-700 text-rose-200' : 'farm-tile-3d bg-gradient-to-b from-emerald-700 to-emerald-900 border-emerald-600 text-emerald-100';
+
+                return `
+                    <div onclick="showTreeDetails(${index})" class="cursor-pointer relative group flex flex-col items-center justify-center p-4 rounded-2xl border-2 ${tileClass} text-center shadow-xl">
+                        <span class="text-4xl mb-2 filter drop-shadow-md">${item.icon || '🌲'}</span>
+                        <span class="text-xs font-bold truncate w-full">${item.subject}</span>
+                        <span class="text-[10px] opacity-90">${item.duration} دقيقة</span>
+                        <span class="absolute top-1 right-1 text-[9px] px-1.5 py-0.5 rounded-full ${isDead ? 'bg-rose-500/40 text-rose-200' : 'bg-emerald-500/40 text-emerald-200'}">${item.status}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showTreeDetails(index) {
+            const item = state.history[index];
+            if (!item) return;
+            alert(` تفاصيل شجرة المزرعة (رقم ${index + 1}):\n\n📖 المادة الدراسية: ${item.subject}\n⏱️ مدة التركيز: ${item.duration} دقيقة\n📅 تاريخ الجلسة: ${item.date}\n🌿 حالة الشجرة: ${item.status === 'ناجحة' ? 'شجرة حية ومزهرة ✨' : 'شجرة ذبلانة 🥀'}`);
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            if (!list) return;
+            if (state.history.length === 0) {
+                list.innerHTML = `<p class="text-xs text-emerald-600">لا توجد جلسات سابقة حتى الآن.</p>`;
+                return;
+            }
+            list.innerHTML = state.history.map((item, index) => `
+                <div onclick="showTreeDetails(${index})" class="cursor-pointer bg-emerald-950/40 p-3 rounded-2xl border border-emerald-800/30 flex justify-between items-center text-xs hover:bg-emerald-900/30 transition">
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <span class="text-2xl bg-emerald-900/50 p-1.5 rounded-xl border border-emerald-800">${item.icon || '🌲'}</span>
+                        <div>
+                            <span class="font-bold text-emerald-200 block text-sm">${item.subject}</span>
+                            <span class="text-emerald-400/80 text-[11px]">⏱️ المدة: ${item.duration} دقيقة | 📅 التاريخ: ${item.date}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="px-2.5 py-1 rounded-xl font-bold text-[11px] ${item.status === 'ناجحة' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'}">${item.status}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tab) {
+            const focusView = document.getElementById('tab-focus-view');
+            const hubView = document.getElementById('tab-hub-view');
+            const forestView = document.getElementById('tab-forest-view');
+
+            const navFocus = document.getElementById('nav-focus');
+            const navHub = document.getElementById('nav-hub');
+            const navForest = document.getElementById('nav-forest');
+
+            focusView.classList.add('hidden');
+            hubView.classList.add('hidden');
+            forestView.classList.add('hidden');
+
+            navFocus.className = "flex flex-col items-center text-emerald-600/70 hover:text-emerald-400 text-xs font-bold space-y-1 transition";
+            navHub.className = "flex flex-col items-center text-emerald-600/70 hover:text-emerald-400 text-xs font-bold space-y-1 transition";
+            navForest.className = "flex flex-col items-center text-emerald-600/70 hover:text-emerald-400 text-xs font-bold space-y-1 transition";
+
+            if (tab === 'focus') {
+                focusView.classList.remove('hidden');
+                navFocus.className = "flex flex-col items-center text-emerald-400 text-xs font-bold space-y-1";
+            } else if (tab === 'hub') {
+                hubView.classList.remove('hidden');
+                navHub.className = "flex flex-col items-center text-emerald-400 text-xs font-bold space-y-1";
+            } else if (tab === 'forest') {
+                forestView.classList.remove('hidden');
+                navForest.className = "flex flex-col items-center text-emerald-400 text-xs font-bold space-y-1";
+                renderVisualForest();
+                renderHistory();
+            }
+        }
+
+        function switchHubMode(mode) {
+            const pdfSec = document.getElementById('hub-pdf-section');
+            const webSec = document.getElementById('hub-web-section');
+            const btnPdf = document.getElementById('mode-btn-pdf');
+            const btnWeb = document.getElementById('mode-btn-web');
+
+            if (mode === 'pdf') {
+                pdfSec.classList.remove('hidden');
+                webSec.classList.add('hidden');
+                btnPdf.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-emerald-950 shadow transition";
+                btnWeb.className = "px-4 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white transition";
+            } else {
+                pdfSec.classList.add('hidden');
+                webSec.classList.remove('hidden');
+                btnWeb.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-emerald-950 shadow transition";
+                btnPdf.className = "px-4 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white transition";
+            }
+        }
+
+        function loadPDF(event) {
+            const file = event.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const fileURL = URL.createObjectURL(file);
+                const frame = document.getElementById('pdf-frame');
+                const placeholder = document.getElementById('pdf-placeholder');
+                
+                frame.src = fileURL;
+                frame.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                document.getElementById('pdf-name').innerText = file.name;
+            }
+        }
+
+        let audioCtx = null;
+        let isPlayingSound = false;
+        function toggleSound() {
+            const select = document.getElementById('sound-select').value;
+            const btn = document.getElementById('sound-toggle-btn');
+            if (select === 'none') {
+                alert("يرجى تحديد نوع الصوت أولاً.");
+                return;
+            }
+            if (!isPlayingSound) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                isPlayingSound = true;
+                btn.innerText = "إيقاف";
+                btn.classList.replace('bg-emerald-700', 'bg-rose-700');
+            } else {
+                if (audioCtx) audioCtx.close();
+                isPlayingSound = false;
+                btn.innerText = "تشغيل";
+                btn.classList.replace('bg-rose-700', 'bg-emerald-700');
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
